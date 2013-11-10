@@ -26,7 +26,7 @@ def find_mod_version(bot_mod_list, mod_name):
     return None
 
 
-PACK_XML_TREE = ET.parse('pack.xml')
+PACK_XML_TREE = ET.parse('../pack.xml')
 PACK_XML_ROOT = PACK_XML_TREE.getroot()
 with open('links.html', 'w') as linksfile:
     PACK_REPORT_HTML = """<html>

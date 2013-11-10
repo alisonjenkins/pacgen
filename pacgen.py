@@ -6,7 +6,6 @@ Minecraft mod packs.
 import xml.etree.ElementTree as ET
 import urllib2
 import json
-import pdb
 
 MINECRAFT_VERSION = '1.6.4'
 BOT_URL = "http://bot.notenoughmods.com/%s.json" % MINECRAFT_VERSION
@@ -52,7 +51,6 @@ with open('../pacgen_report.html', 'w') as linksfile:
             mod.attrib['version'].replace('%s-'
                                           % MINECRAFT_VERSION, '')
 
-        # pdb.set_trace()
         # try:
         if not current_version:
             current_version = {}

@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ET
 import urllib2
 import sys
 import json
-import pdb
+# import pdb
 
 try:
     import yaml
@@ -25,7 +25,9 @@ class Pacgen(object):
 
     def get_bot_mods(self):
         headers = {}
-        headers['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/30.0.1599.101 Safari/537.36"
+        headers['User-Agent'] = "Mozilla/5.0 (Macintosh; Intel Mac OS X \
+                10_9_0) AppleWebKit/537.36 (KHTML, like Gecko) \
+                Chrome/30.0.1599.101 Safari/537.36"
         request = urllib2.Request(self.BOT_URL, headers=headers)
         BOT_MODS_RESPONSE = urllib2.urlopen(request)
         self.BOT_MOD_LIST = json.loads(BOT_MODS_RESPONSE.read())
@@ -62,7 +64,7 @@ class Pacgen(object):
 
         for mod in self.config['mods']:
             if mod['name'] not in pack_mod_names:
-                 self.missing_mods.append(mod)
+                self.missing_mods.append(mod)
 
     def generate_outdated_mods(self):
         self.outdated_mods = []
@@ -80,33 +82,9 @@ class Pacgen(object):
             elif current_version['version'] == 'dev-only':
                 if current_version['dev'] != mod_version_no_mc:
                     self.outdated_mods.append(mod)
-                    # if current_version['longurl'] != "Unknown":
-                        # PACK_REPORT_HTML += """<td>
-                        #                          <a href=%s>Update</a>
-                        #                        </td>"""\
-                        #     % current_version['longurl']
-                    # else:
-                    #     PACK_REPORT_HTML += "<td></td>"
-                    # PACK_REPORT_HTML += "<td>%s</td><td>%s</td></tr>"\
-                    #     % (mod.attrib['version'], current_version['dev'])
             else:
                 if current_version['version'] != mod_version_no_mc:
                     self.outdated_mods.append(mod)
-                    # PACK_REPORT_HTML += """<tr>
-                    #                        <td>
-                    #                          <a href=\"%s\">%s</a>
-                    #                        </td>"""\
-                    #     % (mod.attrib['website'], mod.attrib['name'])
-                    # if current_version['longurl'] != "Unknown":
-                    #     PACK_REPORT_HTML += """<td>
-                    #                            <a href=%s>Update</a>
-                    #                          </td>"""\
-                    #         % current_version['longurl']
-                    # else:
-                    #     PACK_REPORT_HTML += "<td></td>"
-                    # PACK_REPORT_HTML += "<td>%s</td><td>%s</td></tr>"\
-                    #     % (mod.attrib['version'],
-                    #         current_version['version'])
 
     def output_unknown_mods(self):
         html = ""
@@ -142,17 +120,18 @@ class Pacgen(object):
             for mod in self.outdated_mods:
                 current_version = self.find_mod_version(self.BOT_MOD_LIST,
                                                         mod.attrib['name'])
-                html += "<tr><td><a href=%s>%s</a></td><td><a href=%s>Update</a></td><td>%s</td><td>%s</td></tr>" % (mod.attrib['website'], mod.attrib['name'], current_version['longurl'], mod.attrib['version'], current_version['version'])
+                html += "<tr><td><a href=%s>%s</a></td><td><a href=%s>\
+                        Update</a></td><td>%s</td><td>%s</td></tr>" % (
+                        mod.attrib['website'],
+                        mod.attrib['name'],
+                        current_version['longurl'],
+                        mod.attrib['version'],
+                        current_version['version']
+                    )
 
             html += "</table>"
 
         return html
-            # for mod in self.PACK_XML_ROOT[2]:
-            #     current_version = self.find_mod_version(self.BOT_MOD_LIST,
-            #                                             mod.attrib['name'])
-            #     mod_version_no_mc = \
-            #         mod.attrib['version'].replace('%s-'
-            #                                       % self.MINECRAFT_VERSION, '')
 
     def output_missing_mods(self):
         if self.missing_mods:

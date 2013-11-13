@@ -32,13 +32,13 @@ class Pacgen(object):
         BOT_MODS_RESPONSE = urllib2.urlopen(request)
         self.BOT_MOD_LIST = json.loads(BOT_MODS_RESPONSE.read())
 
-    def find_mod_version(self, bot_mod_list, mod_name):
+    def find_mod_version(self, mod_name):
         """
         This function searches through the notenoughmods bot's mod list
         for the specified mod name. If found it returns the bot's mod entry
         else returns None.
         """
-        for bot_mod in bot_mod_list:
+        for bot_mod in self.BOT_MOD_LIST:
             if bot_mod['name'].lower() == mod_name.lower():
                 return bot_mod
         return None
@@ -71,8 +71,7 @@ class Pacgen(object):
         self.unknown_mods = []
 
         for mod in self.PACK_XML_ROOT[2]:
-            current_version = self.find_mod_version(self.BOT_MOD_LIST,
-                                                    mod.attrib['name'])
+            current_version = self.find_mod_version(mod.attrib['name'])
             mod_version_no_mc = \
                 mod.attrib['version'].replace('%s-'
                                               % self.MINECRAFT_VERSION, '')
@@ -99,7 +98,11 @@ class Pacgen(object):
             for mod in self.unknown_mods:
                 html += """
                 <tr><td><a href=%s>%s</a></td><td><a href=%s>Update</a></tr>
-                """ % (mod.attrib['website'], mod.attrib['name'], mod.attrib['website'])
+                """ % (
+                        mod.attrib['website'],
+                        mod.attrib['name'],
+                        mod.attrib['website']
+                    )
             html += "</table>"
 
         return html
@@ -118,8 +121,7 @@ class Pacgen(object):
             </tr>"""
 
             for mod in self.outdated_mods:
-                current_version = self.find_mod_version(self.BOT_MOD_LIST,
-                                                        mod.attrib['name'])
+                current_version = self.find_mod_version(mod.attrib['name'])
                 html += "<tr><td><a href=%s>%s</a></td><td><a href=%s>\
                         Update</a></td><td>%s</td><td>%s</td></tr>" % (
                         mod.attrib['website'],
@@ -145,10 +147,22 @@ class Pacgen(object):
             """
 
             for mod in self.missing_mods:
-                html += """
-                <tr>
-                <td>%s</td>
-                """ % mod['name']
+                mod_version = self.find_mod_version(mod['name'])
+                if mod_version:
+                    html += """
+                    <tr>
+                    <td><a href="%s">%s</a></td>
+                    """ % (
+                            mod_version['longurl'],
+                            mod['name']
+                        )
+                else:
+                    html += """
+                    <tr>
+                    <td>%s</td>
+                    """ % (
+                            mod['name']
+                        )
 
                 if 'version' in mod.keys():
                     html += """

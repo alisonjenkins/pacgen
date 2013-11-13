@@ -56,9 +56,13 @@ class Pacgen(object):
 
     def generate_missing_mods(self):
         self.missing_mods = []
+        pack_mod_names = []
+        for mod in self.PACK_XML_ROOT[2]:
+            pack_mod_names.append(mod.attrib['name'])
+
         for mod in self.config['mods']:
-            if mod['name'] not in self.PACK_XML_ROOT[2]:
-                self.missing_mods.append(mod)
+            if mod['name'] not in pack_mod_names:
+                 self.missing_mods.append(mod)
 
     def generate_outdated_mods(self):
         self.outdated_mods = []
@@ -115,7 +119,6 @@ class Pacgen(object):
             </tr>"""
 
             for mod in self.unknown_mods:
-                # pdb.set_trace()
                 html += """
                 <tr><td><a href=%s>%s</a></td><td><a href=%s>Update</a></tr>
                 """ % (mod.attrib['website'], mod.attrib['name'], mod.attrib['website'])

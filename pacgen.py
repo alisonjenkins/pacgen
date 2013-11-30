@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 """
 This program is used to generate and aid in the maintenance of ATLauncher
 Minecraft mod packs.

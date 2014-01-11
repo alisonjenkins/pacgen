@@ -72,17 +72,15 @@ class Pacgen(object):
 
         for mod in self.PACK_XML_ROOT[2]:
             current_version = self.find_mod_version(mod.attrib['name'])
-            mod_version_no_mc = \
-                mod.attrib['version'].replace('%s-'
-                                              % self.MINECRAFT_VERSION, '')
+            mod_version = mod.attrib['version']
 
             if not current_version:
                 self.unknown_mods.append(mod)
-            elif current_version['version'] == 'dev-only':
-                if current_version['dev'] != mod_version_no_mc:
+            elif str(current_version['version']) == 'dev-only':
+                if str(current_version['dev']) != str(mod_version):
                     self.outdated_mods.append(mod)
             else:
-                if current_version['version'] != mod_version_no_mc:
+                if str(current_version['version']) != str(mod_version):
                     self.outdated_mods.append(mod)
 
     def output_unknown_mods(self):
@@ -122,13 +120,18 @@ class Pacgen(object):
 
             for mod in self.outdated_mods:
                 current_version = self.find_mod_version(mod.attrib['name'])
+                if str(current_version['version']).lower() == 'dev-only':
+                    latest_version = current_version['dev']
+                else:
+                    latest_version = current_version['version']
+
                 html += "<tr><td><a href=%s>%s</a></td><td><a href=%s>\
                         Update</a></td><td>%s</td><td>%s</td></tr>" % (
                         mod.attrib['website'],
                         mod.attrib['name'],
                         current_version['longurl'],
                         mod.attrib['version'],
-                        current_version['version']
+                        latest_version
                     )
 
             html += "</table>"

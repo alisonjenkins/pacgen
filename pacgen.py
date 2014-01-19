@@ -9,12 +9,7 @@ import sys
 import json
 # import pdb
 
-try:
-    import yaml
-except ImportError:
-    print("Failed to import pyyaml please install pyyaml")
-    sys.exit(1)
-
+import ConfigParser
 
 class Pacgen(object):
     def __init__(self, config_file_path="../pacgen_config.yaml"):

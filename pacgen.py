@@ -7,14 +7,14 @@ import xml.etree.ElementTree as ET
 import urllib2
 import sys
 import json
-# import pdb
+import pdb
 
 import ConfigParser
 
 class Pacgen(object):
-    def __init__(self, config_file_path="../pacgen_config.yaml"):
+    def __init__(self, config_file_path="../pacgen_config.ini"):
         self.parse_config_file(config_file_path)
-        self.MINECRAFT_VERSION = self.config['minecraft-version']
+        self.MINECRAFT_VERSION = self.config.get('general', 'minecraft-version')
         self.BOT_URL = "http://bot.notenoughmods.com/%s.json"\
             % self.MINECRAFT_VERSION
 
@@ -46,19 +46,33 @@ class Pacgen(object):
         self.PACK_XML_TREE = ET.parse(xml_path)
         self.PACK_XML_ROOT = self.PACK_XML_TREE.getroot()
 
-    def parse_config_file(self, config_path="../pacgen_config.yml"):
-        with open(config_path) as config_file:
-            config_contents = config_file.read()
-        self.config = yaml.load(config_contents)
+    def parse_config_file(self, config_path="../pacgen_config.ini"):
+        self.config = ConfigParser.ConfigParser()
+        self.config.read(config_path)
+
+    def get_wanted_mods(self):
+        wanted_mods = self.config.get('mods','wanted_mods')
+        wanted_mods = wanted_mods.replace('\n','') # remove the newlines
+        wanted_mods = wanted_mods.split(',') # turn it into a list of mods
+        return wanted_mods
 
     def generate_missing_mods(self):
         self.missing_mods = []
         pack_mod_names = []
+
+        # add all mods in the pack's xml to a
+        # 'pack_mod_names' list.
         for mod in self.PACK_XML_ROOT[2]:
             pack_mod_names.append(mod.attrib['name'])
 
-        for mod in self.config['mods']:
-            if mod['name'] not in pack_mod_names:
+        # gets the list of wanted mods from the config file.
+        wanted_mods = self.get_wanted_mods()
+
+        # go through the list of wanted mods in the config file.
+        # if mod listed is not in the pack's xml add to missing
+        # mod list.
+        for mod in wanted_mods:
+            if mod not in pack_mod_names:
                 self.missing_mods.append(mod)
 
     def generate_outdated_mods(self):
@@ -140,32 +154,26 @@ class Pacgen(object):
             <table>
             <tr>
             <th>Missing Mod name</th>
-            <th>Version requred</th>
             </tr>
             """
 
             for mod in self.missing_mods:
-                mod_version = self.find_mod_version(mod['name'])
+                mod_version = self.find_mod_version(mod)
                 if mod_version:
                     html += """
                     <tr>
                     <td><a href="%s">%s</a></td>
                     """ % (
                             mod_version['longurl'],
-                            mod['name']
+                            mod
                         )
                 else:
                     html += """
                     <tr>
                     <td>%s</td>
                     """ % (
-                            mod['name']
+                            mod
                         )
-
-                if 'version' in mod.keys():
-                    html += """
-                    <td>%s</td>
-                    """ % mod['version']
                 html += "</tr>"
             html += "</table>"
         else:
